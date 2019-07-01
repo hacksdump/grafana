@@ -149,9 +149,12 @@ describe('Request URL', () => {
     const instance = new LanguageProvider(datasourceWithLabels, { initialRange: rangeMock as TimeRange });
     await instance.refreshLogLabels(DefaultTimeZone, rangeMock as TimeRange, true);
     const updatedRange = getTimeRange(DefaultTimeZone, rangeMock.raw);
-    const expectedUrl = `/api/prom/label?start=${updatedRange.from.valueOf() *
-      NS_IN_MS}&end=${updatedRange.to.valueOf() * NS_IN_MS}`;
-    expect(datasourceSpy.firstCall.calledWith(expectedUrl)).toBe(true);
+    const expectedUrl = '/api/prom/label';
+    const expectedParams = {
+      start: updatedRange.from.valueOf() * NS_IN_MS,
+      end: updatedRange.to.valueOf() * NS_IN_MS,
+    };
+    expect(datasourceSpy.firstCall.calledWith(expectedUrl, expectedParams)).toBe(true);
   });
 });
 

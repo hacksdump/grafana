@@ -72,8 +72,8 @@ export default class LokiLanguageProvider extends LanguageProvider {
     return syntax;
   }
 
-  request = (url: string) => {
-    return this.datasource.metadataRequest(url);
+  request = (url: string, params?: any) => {
+    return this.datasource.metadataRequest(url, params);
   };
 
   start = () => {
@@ -214,7 +214,7 @@ export default class LokiLanguageProvider extends LanguageProvider {
       if (existingKeys && existingKeys.length > 0) {
         // Check for common labels
         for (const key in labels) {
-          if (existingKeys && existingKeys.indexOf(key) > -1) {
+          if (existingKeys && existingKeys.includes(key)) {
             // Should we check for label value equality here?
             labelsToKeep[key] = labels[key];
           }
@@ -240,8 +240,11 @@ export default class LokiLanguageProvider extends LanguageProvider {
     try {
       this.logLabelFetchTs = Date.now();
       const updatedRange = getTimeRange(timeZone, range.raw);
-      const params = updatedRange ? this.rangeToParams(updatedRange) : '';
-      const res = await this.request(`${url}${params}`);
+      const params = {
+        start: updatedRange.from.valueOf() * NS_IN_MS,
+        end: updatedRange.to.valueOf() * NS_IN_MS,
+      };
+      const res = await this.request(url, params);
       const body = await (res.data || res.json());
       const labelKeys = body.data.slice().sort();
       this.labelKeys = {
@@ -253,7 +256,7 @@ export default class LokiLanguageProvider extends LanguageProvider {
       // Pre-load values for default labels
       return Promise.all(
         labelKeys
-          .filter((key: string) => DEFAULT_KEYS.indexOf(key) > -1)
+          .filter((key: string) => DEFAULT_KEYS.includes(key))
           .map((key: string) => this.fetchLabelValues(key, timeZone, range))
       );
     } catch (e) {
@@ -270,10 +273,13 @@ export default class LokiLanguageProvider extends LanguageProvider {
 
   async fetchLabelValues(key: string, timeZone: TimeZone, range?: TimeRange) {
     const updatedRange = getTimeRange(timeZone, range.raw);
-    const params = updatedRange ? this.rangeToParams(updatedRange) : '';
-    const url = `/api/prom/label/${key}/values${params}`;
+    const params = {
+      start: updatedRange.from.valueOf() * NS_IN_MS,
+      end: updatedRange.to.valueOf() * NS_IN_MS,
+    };
+    const url = `/api/prom/label/${key}/values`;
     try {
-      const res = await this.request(url);
+      const res = await this.request(url, params);
       const body = await (res.data || res.json());
       const values = body.data.slice().sort();
 
@@ -301,13 +307,5 @@ export default class LokiLanguageProvider extends LanguageProvider {
     } catch (e) {
       console.error(e);
     }
-  }
-
-  private rangeToParams(range: TimeRange): string {
-    const start = range.from.valueOf() * NS_IN_MS;
-    const end = range.to.valueOf() * NS_IN_MS;
-    const params = `?start=${start}&end=${end}`;
-
-    return params;
   }
 }

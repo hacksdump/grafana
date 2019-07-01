@@ -41,7 +41,7 @@ func getTeamSelectSqlBase() string {
 		team.org_id,
 		team.name as name,
 		team.email as email,
-		(SELECT COUNT(*) from team_member where team_member.team_id = team.id) as member_count 
+		(SELECT COUNT(*) from team_member where team_member.team_id = team.id) as member_count
 		FROM team as team `
 }
 
@@ -258,6 +258,7 @@ func AddTeamMember(cmd *m.AddTeamMemberCommand) error {
 			TeamId:     cmd.TeamId,
 			UserId:     cmd.UserId,
 			External:   cmd.External,
+			AuthModule: cmd.AuthModule,
 			Created:    time.Now(),
 			Updated:    time.Now(),
 			Permission: cmd.Permission,
@@ -377,7 +378,7 @@ func GetTeamMembers(query *m.GetTeamMembersQuery) error {
 	if query.External {
 		sess.Where("team_member.external=?", dialect.BooleanStr(true))
 	}
-	sess.Cols("team_member.org_id", "team_member.team_id", "team_member.user_id", "user.email", "user.login", "team_member.external", "team_member.permission")
+	sess.Cols("team_member.org_id", "team_member.team_id", "team_member.user_id", "user.email", "user.login", "team_member.external", "team_member.auth_module", "team_member.permission")
 	sess.Asc("user.login", "user.email")
 
 	err := sess.Find(&query.Result)

@@ -58,4 +58,8 @@ func addTeamMigrations(mg *Migrator) {
 	mg.AddMigration("Add column permission to team_member table", NewAddColumnMigration(teamMemberV1, &Column{
 		Name: "permission", Type: DB_SmallInt, Nullable: true,
 	}))
+
+	mg.AddMigration("Add column auth_module to team_member table", NewAddColumnMigration(teamMemberV1, &Column{
+		Name: "auth_module", Type: DB_NVarchar, Nullable: true, Length: 190,
+	}))
 }

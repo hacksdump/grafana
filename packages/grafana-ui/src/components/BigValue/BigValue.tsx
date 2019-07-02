@@ -74,7 +74,7 @@ export class BigValue extends PureComponent<Props> {
       };
 
       try {
-        $.plot(this.canvasElement, [plotSeries], options);
+        ($ as any).plot(this.canvasElement, [plotSeries], options);
       } catch (err) {
         console.log('sparkline rendering error', err, options);
       }

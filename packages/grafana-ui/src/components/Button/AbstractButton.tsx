@@ -158,8 +158,8 @@ const getButtonStyles = (theme: GrafanaTheme, size: ButtonSize, variant: ButtonV
 export const AbstractButton: React.FunctionComponent<AbstractButtonProps> = ({
   renderAs,
   theme,
-  size = 'md',
-  variant = 'primary',
+  size = 'md' as ButtonSize,
+  variant = 'primary' as ButtonVariant,
   className,
   icon,
   children,

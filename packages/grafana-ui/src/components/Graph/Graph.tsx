@@ -57,7 +57,18 @@ export class Graph extends PureComponent<GraphProps> {
       }),
       yAxisConfig => yAxisConfig.index
     );
+    const colors = series.map(s => {
+      return s.color;
+    });
+    const flotSeriesData = series.map(s => {
+      const graphPoints = [];
+      for (let i = 0; i < s.data.length; i++) {
+        graphPoints[i] = [s.data[i][1], s.data[i][0]];
+      }
+      return graphPoints;
+    });
     const flotOptions = {
+      colors: colors,
       legend: {
         show: false,
       },
@@ -103,11 +114,11 @@ export class Graph extends PureComponent<GraphProps> {
         labelMarginX: 0,
       },
     };
-
+    console.log('test');
     try {
-      $.plot(this.element, series, flotOptions);
+      ($ as any).plot(this.element, flotSeriesData, flotOptions);
     } catch (err) {
-      console.log('Graph rendering error', err, flotOptions, series);
+      console.log('Graph could not be rendered due to', err, flotOptions, series);
       throw new Error('Error rendering panel');
     }
   }
@@ -115,7 +126,11 @@ export class Graph extends PureComponent<GraphProps> {
   render() {
     return (
       <div className="graph-panel">
-        <div className="graph-panel__chart" ref={e => (this.element = e)} />
+        <div
+          style={{ height: this.props.height + 'px' }}
+          className="graph-panel__chart"
+          ref={e => (this.element = e)}
+        />
       </div>
     );
   }

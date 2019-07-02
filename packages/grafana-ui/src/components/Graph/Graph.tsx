@@ -114,7 +114,6 @@ export class Graph extends PureComponent<GraphProps> {
         labelMarginX: 0,
       },
     };
-    console.log('test');
     try {
       ($ as any).plot(this.element, flotSeriesData, flotOptions);
     } catch (err) {
